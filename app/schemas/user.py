@@ -1,12 +1,12 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
-from .base import BaseSchema, BaseModel, BaseSchema
+from .base import BaseSchema, BaseModel
 
 if TYPE_CHECKING:
     from .note import Note
 
 class User(BaseSchema):
-    id: int
+    id: str
     username: str
     created_at: datetime
     updated_at: datetime
@@ -14,7 +14,7 @@ class User(BaseSchema):
 
 
 class UserInDB(BaseSchema):
-    id: int
+    id: str
     username: str
     created_at: datetime
     updated_at: datetime

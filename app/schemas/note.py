@@ -8,19 +8,19 @@ if TYPE_CHECKING:
 
 
 class Note(BaseSchema):
-    id: int
+    id: str
     title: str
     content: str
     created_at: datetime
     updated_at: datetime
-    author: User
+    author: "User"
 
 
 class NoteInDB(BaseSchema):
-    id: int
+    id: str
     title: str
     content: str
-    author_id: int
+    author_id: str
     created_at: datetime
     updated_at: datetime
 
