@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
-from .base import BaseSchema, BaseModel
+from .base import BaseSchema, BaseModel, BaseSchema
 
 if TYPE_CHECKING:
     from .note import Note
@@ -10,7 +10,7 @@ class User(BaseSchema):
     username: str
     created_at: datetime
     updated_at: datetime
-    notes: list[Note]
+    notes: list[Note] = []
 
 
 class UserInDB(BaseSchema):
@@ -18,13 +18,9 @@ class UserInDB(BaseSchema):
     username: str
     created_at: datetime
     updated_at: datetime
-    notes: list[Note]
 
 
-class UserCreate(BaseModel):
+class UserRequest(BaseModel):
     username: str
     password: str
-
-class UserUpdate(BaseModel):
-    username: str | None = None
-    password: str | None = None
+    

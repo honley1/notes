@@ -1,4 +1,4 @@
-from __future__ import annotations
+import uuid
 from datetime import datetime
 from sqlalchemy import String, text
 from sqlalchemy.sql import func
@@ -13,9 +13,9 @@ if TYPE_CHECKING:
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(server_default=text("now()"), nullable=False)
 
-    notes: Mapped[list["Note"]] = relationship(back_populates="author")
+    notes: Mapped[list["Note"]] = relationship(back_populates="author", default_factory=list)
