@@ -12,7 +12,7 @@ from app.utils.jwt import create_access_token
 
 router = APIRouter()
 
-@router.post("/register")
+@router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
     try:
         result = await db.execute(select(User).where(User.username == user_data.username))
@@ -52,7 +52,7 @@ async def register(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
             detail="Internal server error"
         )
 
-@router.post("/login")
+@router.post("/login", status_code=status.HTTP_200_OK)
 async def login(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
     try:
         result = await db.execute(select(User).where(User.username == user_data.username))
@@ -88,7 +88,7 @@ async def login(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
             detail="Internal server error"
         )
 
-@router.get("/me")
+@router.get("/me", status_code=status.HTTP_200_OK)
 async def me(user: UserResponse = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     try:
         result = await db.execute(select(User).where(User.id == user.id))
@@ -102,6 +102,8 @@ async def me(user: UserResponse = Depends(get_current_user), db: AsyncSession = 
             "message": "User profile retrieved successfully",
             "data": UserResponse.model_validate(user_data)
         }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
