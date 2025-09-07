@@ -8,7 +8,7 @@ from app.schemas.user import UserInDB, UserRequest
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_user
 
-from app.utils import response
+from app.utils.response import response
 from app.utils.hash import get_password_hash, verify_password
 from app.utils.jwt import create_access_token
 
@@ -36,7 +36,7 @@ async def register(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
 
         user = UserInDB.model_validate(user)
 
-        access_token = create_access_token(user.model_dump())
+        access_token = create_access_token(user_data.model_dump())
 
         return response(True, {"token": access_token}, 201)
     except Exception as e:
@@ -59,7 +59,7 @@ async def login(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
         
         user = UserInDB.model_validate(user)
 
-        access_token = create_access_token(user.model_dump())
+        access_token = create_access_token(user_data.model_dump())
 
         return response(True, {"token": access_token}, 200)
     except Exception as e:

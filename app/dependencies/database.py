@@ -17,7 +17,7 @@ class Base(DeclarativeBase):
     updated_at: Mapped[datetime] = mapped_column(server_default=text("now()"), nullable=False)
 
 
-engine: AsyncEngine = create_async_engine(DATABASE_URL, echo=True)
+engine: AsyncEngine = create_async_engine(DATABASE_URL, echo=False)
 
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
