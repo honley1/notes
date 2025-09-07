@@ -23,4 +23,3 @@ class UserInDB(BaseSchema):
 class UserRequest(BaseModel):
     username: str
     password: str
-    
