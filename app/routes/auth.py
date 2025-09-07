@@ -89,7 +89,7 @@ async def login(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
         )
 
 @router.get("/me")
-async def me(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def me(user: UserResponse = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     try:
         result = await db.execute(select(User).where(User.id == user.id))
         user_data = result.scalar_one_or_none()

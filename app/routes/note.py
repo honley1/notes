@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from app.dependencies.auth import get_current_user
 from app.dependencies.database import get_db
@@ -12,15 +13,16 @@ from app.schemas.user import UserResponse
 router = APIRouter()
 
 @router.get('/')
-async def get_notes(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def get_notes(user: UserResponse = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     try:
-        result = await db.execute(select(Note).where(Note.author_id == user.id))
+        result = await db.execute(select(Note).options(joinedload(Note.author)).where(Note.author_id == user.id))
         notes = result.scalars().all()
         return {
             "message": "Notes retrieved successfully",
             "data": [NoteResponse.model_validate(note) for note in notes]
         }
     except Exception as e:
+        print(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error"
@@ -28,7 +30,7 @@ async def get_notes(user: User = Depends(get_current_user), db: AsyncSession = D
 
 
 @router.post('/')
-async def create_note(note_data: NoteRequest, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def create_note(note_data: NoteRequest, user: UserResponse = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     try:
         note = Note(
             **note_data.model_dump(),
@@ -39,8 +41,8 @@ async def create_note(note_data: NoteRequest, user: User = Depends(get_current_u
         await db.commit()
         await db.refresh(note)
 
-        new_note = NoteResponse.model_validate(note)
-        new_note.author = UserResponse.model_validate(user)
+        result = await db.execute(select(Note).options(joinedload(Note.author)).where(Note.id == note.id))
+        new_note = result.scalar_one()
 
         return {
             "message": "Note created successfully",
