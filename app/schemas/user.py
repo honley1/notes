@@ -1,19 +1,24 @@
 from datetime import datetime
-from pydantic import BaseModel
 from typing import TYPE_CHECKING
+from .base import BaseSchema, BaseModel
 
 if TYPE_CHECKING:
     from .note import Note
 
-class User(BaseModel):
+class User(BaseSchema):
     id: int
     username: str
     created_at: datetime
     updated_at: datetime
     notes: list[Note]
 
-    class Config:
-        from_attributes = True
+
+class UserInDB(BaseSchema):
+    id: int
+    username: str
+    created_at: datetime
+    updated_at: datetime
+    notes: list[Note]
 
 
 class UserCreate(BaseModel):
@@ -21,5 +26,5 @@ class UserCreate(BaseModel):
     password: str
 
 class UserUpdate(BaseModel):
-    username: str
-    password: str
+    username: str | None = None
+    password: str | None = None
