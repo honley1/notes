@@ -1,22 +1,19 @@
+from __future__ import annotations
 from datetime import datetime
-from typing import TYPE_CHECKING
-
 from .base import BaseSchema, BaseModel
-
-if TYPE_CHECKING:
-    from .user import User
+from .user import UserResponse
 
 
-class Note(BaseSchema):
+class NoteResponse(BaseSchema):
     id: str
     title: str
     content: str
     created_at: datetime
     updated_at: datetime
-    author: "User"
+    author: UserResponse
 
 
-class NoteInDB(BaseSchema):
+class Note(BaseSchema):
     id: str
     title: str
     content: str
@@ -25,11 +22,6 @@ class NoteInDB(BaseSchema):
     updated_at: datetime
 
 
-class NoteCreate(BaseModel):
+class NoteRequest(BaseModel):
     title: str
     content: str
-
-
-class NoteUpdate(BaseModel):
-    title: str | None = None
-    content: str | None = None

@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.models.user import User
-from app.schemas.user import UserInDB, UserRequest
+from app.schemas.user import UserRequest, UserResponse
 from app.dependencies.database import get_db
 from app.dependencies.auth import get_current_user
 
@@ -34,13 +34,13 @@ async def register(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
         await db.commit()
         await db.refresh(user)
 
-        user_in_db = UserInDB.model_validate(user)
+        user_in_db = UserResponse.model_validate(user)
         access_token = create_access_token({"id": user_in_db.id, "username": user_in_db.username})
 
         return {
             "message": "User registered successfully",
             "data": {
-                "user": user_in_db.model_dump(),
+                "user": UserResponse.model_validate(user_in_db),
                 "token": access_token
             }
         }
@@ -70,13 +70,13 @@ async def login(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
                 detail="Invalid credentials"
             )
         
-        user_in_db = UserInDB.model_validate(user)
+        user_in_db = UserResponse.model_validate(user)
         access_token = create_access_token({"id": user_in_db.id, "username": user_in_db.username})
 
         return {
             "message": "Login successful",
             "data": {
-                "user": user_in_db.model_dump(),
+                "user": UserResponse.model_validate(user_in_db),
                 "token": access_token
             }
         }
@@ -89,12 +89,18 @@ async def login(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
         )
 
 @router.get("/me")
-async def me(user: User = Depends(get_current_user)):
+async def me(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     try:
-        user_data = UserInDB.model_validate(user)
+        result = await db.execute(select(User).where(User.id == user.id))
+        user_data = result.scalar_one_or_none()
+        if not user_data:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="User not found"
+            )
         return {
             "message": "User profile retrieved successfully",
-            "data": user_data.model_dump()
+            "data": UserResponse.model_validate(user_data)
         }
     except Exception as e:
         raise HTTPException(
