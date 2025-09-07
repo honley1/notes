@@ -1,12 +1,15 @@
-from sqlalchemy import select
 from fastapi import APIRouter, Depends
+
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
 
-from app.database import get_db
-from app.schemas.user import UserInDB, UserRequest
-
-from app.utils import get_password_hash, response, verify_password
 from app.models.user import User
+from app.schemas.user import UserInDB, UserRequest
+from app.dependencies.database import get_db
+from app.dependencies.auth import get_current_user
+
+from app.utils import response
+from app.utils.hash import get_password_hash, verify_password
 from app.utils.jwt import create_access_token
 
 router = APIRouter()
@@ -61,3 +64,8 @@ async def login(user_data: UserRequest, db: AsyncSession = Depends(get_db)):
         return response(True, {"token": access_token}, 200)
     except Exception as e:
         return response(False, str(e), 500)
+
+
+@router.get("/me")
+async def me(user: User = Depends(get_current_user)):
+    return response(True, user.model_dump(), 200)

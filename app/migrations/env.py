@@ -20,7 +20,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 
-from app.database import Base
+from app.dependencies.database import Base
 from app import models
 target_metadata = Base.metadata
 

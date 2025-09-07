@@ -1,6 +1,6 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from app.database import engine
+from app.dependencies.database import engine
 
 from app.routes import api
 

@@ -10,7 +10,7 @@ class User(BaseSchema):
     username: str
     created_at: datetime
     updated_at: datetime
-    notes: list[Note] = []
+    notes: list["Note"] = []
 
 
 class UserInDB(BaseSchema):

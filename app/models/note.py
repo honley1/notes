@@ -1,8 +1,6 @@
-from __future__ import annotations
-from datetime import datetime
 from sqlalchemy import String, text, ForeignKey, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from app.database import Base
+from app.dependencies.database import Base
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
